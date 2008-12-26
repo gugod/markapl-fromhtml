@@ -78,7 +78,7 @@ __END__
 
 =head1 NAME
 
-Markapl::FromHTML - [One line description of module's purpose here]
+Markapl::FromHTML - Convert HTML to Markapl Perl code.
 
 
 =head1 VERSION
@@ -89,44 +89,52 @@ This document describes Markapl::FromHTML version 0.01
 =head1 SYNOPSIS
 
     use Markapl::FromHTML;
+    use Perl::Tidy qw(perltidy);
 
+    my $html = <<HTML;
+    <h1>Hello World</h1>
+    <p>I am very good</p>
+    <div><p>I am very good, too</p></div>
+    HTML
+
+    my $m = Markapl::FromHTML->new;
+    $m->load($html);
+    print $m->dump;
+    # sub {
+    # h1 { "Hello World" }
+    # p { "I am very good" }
+    # div { p { "I am very good, too" } }
+    # }
 
 =head1 DESCRIPTION
 
+This module converts HTML to Markapl perl code.
 
 =head1 INTERFACE 
-
 
 =over
 
 =item new()
 
-=back
+Constructor. No args required
 
-=head1 DIAGNOSTICS
+=item load( $html_string )
 
-=over
+Load HTML string from a scalar.
 
-=item C<< Error message here, perhaps with %s placeholders >>
+=item dump
 
-[Description of error here]
+convert the loaded HTML string as markapl code.
 
-=item C<< Another error message here >>
+=item convert
 
-[Description of error here]
-
-[Et cetera, et cetera]
+convert the loaded HTML string as markapl code.
 
 =back
-
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-Markapl::FromHTML requires no configuration files or environment variables.
 
 =head1 DEPENDENCIES
 
-None.
+L<HTML::PullParser>, L<Rubyish>
 
 =head1 INCOMPATIBILITIES
 
