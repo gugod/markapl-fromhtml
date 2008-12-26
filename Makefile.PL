@@ -4,7 +4,13 @@ use inc::Module::Install;
 
 all_from 'lib/Markapl/FromHTML.pm';
 
-build_requires  'Test::More'        => '0.42';
+requires
+    'Rubyish'          => 0.31,
+    'HTML::PullParser' => 0;
+
+build_requires
+ 'Test::More' => '0.42',
+ 'Perl::Tidy' => 0;
 
 WriteAll;
 
