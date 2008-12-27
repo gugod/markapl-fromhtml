@@ -5,6 +5,7 @@ use strict;
 use 5.008;
 use Rubyish;
 use HTML::PullParser;
+use Data::Dump qw(pp);
 
 our $VERSION = '0.02';
 
@@ -29,9 +30,11 @@ def convert {
     
     my $current_tag = "";
     my @stack = ();
+    my $indent = 0;
     while(my $token = $p->get_token) {
         if ($token->[0] eq 'S') {
             push @stack, { tag => $token->[1], attr => [@$token[2..$#$token]]};
+            $indent += 1;
         }
         elsif ($token->[0] eq 'T') {
             unless($token->[1] =~ /^\s*$/s ) {
@@ -39,14 +42,21 @@ def convert {
             }
         }
         elsif ($token->[0] eq 'E') {
-            my @content;
+            # pp $token;
+            my $indent_str = " " x ($indent * 4);
+            my $indent_str2 = " " x (4 * $indent + 4);
 
+            my @content;
             my $content = pop @stack;
             while (!$content->{tag} || $content->{tag} ne $token->[1]) {
                 push @content, $content;
                 $content = pop @stack;
             }
+
             my $start_tag = $content;
+
+            # pp $start_tag, \@content;
+            
             my $attr = "";
             my @attr = @{$start_tag->{attr}};
             if (@attr) {
@@ -60,20 +70,32 @@ def convert {
                 my $content_text = $content[0]->{code};
                 $content_text = "\"$content[0]->{text}\"" unless $content_text;
                 push @stack, {
-                    code => "$start_tag->{tag}${attr} { $content_text }"
+                    code => "\n${indent_str}$start_tag->{tag}${attr} {\n${indent_str2}$content_text\n${indent_str}};\n"
                 };
             }
             else {
-                my $content_code = join "\n", map { $_->{code} || $_->{text} } reverse @content;
+                for (@content) {
+                    if ($_->{text}) {
+                        $_->{code} = "outs \"$_->{text}\";";
+                        $_->{text} = undef;
+                    }
+                }
+                my $content_code = join "\n", map { $_->{code} } reverse @content;
                 push @stack, {
-                    code => "$start_tag->{tag}${attr} { $content_code }"
+                    code => "\n${indent_str}$start_tag->{tag}${attr} {\n${indent_str2}$content_code\n$indent_str};\n"
                 };
             }
+
+            $indent -= 1;
         }
     }
 
-    my $ret = join "\n", map { $_->{code} || $_->{text} } @stack;
-    $ret = "sub {\n$ret\n}\n";
+    my $ret = join "\n", "sub {", (map { $_->{code} || $_->{text} } @stack), "\n}\n";
+
+    $ret =~ s/\n\s*\n/\n/g;
+
+    # Re-org any text only blocks to one line.
+    $ret =~ s/\{\n\s+(".+")\n\s+\}(;?)\n/{ $1 }$2\n/g;
     return $ret;
 }
 
