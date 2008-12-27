@@ -1,4 +1,7 @@
 # Revision history for Markapl-FromHTML
 
+0.02:
+  - attributes are now converted
+
 0.01:
   - Initial release.

@@ -5,9 +5,8 @@ use strict;
 use 5.008;
 use Rubyish;
 use HTML::PullParser;
-use Data::Dump qw(pp);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 def load($html) {
     $self->{html} = $html
@@ -31,7 +30,6 @@ def convert {
     my $current_tag = "";
     my @stack = ();
     while(my $token = $p->get_token) {
-        # pp $token;
         if ($token->[0] eq 'S') {
             push @stack, { tag => $token->[1], attr => [@$token[2..$#$token]]};
         }
@@ -41,7 +39,6 @@ def convert {
             }
         }
         elsif ($token->[0] eq 'E') {
-            # pp $token;
             my @content;
 
             my $content = pop @stack;
@@ -67,7 +64,6 @@ def convert {
                 };
             }
             else {
-                # pp @content;
                 my $content_code = join "\n", map { $_->{code} || $_->{text} } reverse @content;
                 push @stack, {
                     code => "$start_tag->{tag}${attr} { $content_code }"
