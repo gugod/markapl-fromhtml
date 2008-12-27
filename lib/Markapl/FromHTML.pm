@@ -5,7 +5,7 @@ use strict;
 use 5.008;
 use Rubyish;
 use HTML::PullParser;
-use Data::Dump qw(pp);
+# use Data::Dump qw(pp);
 
 our $VERSION = '0.02';
 
