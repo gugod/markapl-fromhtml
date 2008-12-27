@@ -19,7 +19,7 @@ sub {
     h1 { "Hello World" };
     p { "I am very good" };
     div {
-      p { "I am very good, too" };
+        p { "I am very good, too" };
     };
 }
 MARKAPL
