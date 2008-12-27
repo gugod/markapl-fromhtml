@@ -21,3 +21,4 @@ t/pod.t
 t/simple.t
 t/simple2.t
 t/simple3.t
+t/simple4.t
